@@ -11,6 +11,8 @@ import (
 type Config struct {
 	API_NAME    string `env:"API_NAME,required"`
 	API_VERSION string `env:"API_VERSION,required"`
+	API_PORT    string `env:"API_PORT,required"`
+	ROUTER      string `env:"ROUTER,required"`
 }
 
 var Cfg = Config{}
@@ -35,5 +37,7 @@ func Init() {
 	fmt.Printf("API_NAME: %s\n", Cfg.API_NAME)
 
 	fmt.Printf("API_VERSION: %d\n", Cfg.API_NAME)
+
+	fmt.Printf("API_PORT: %s\n", Cfg.API_PORT)
 
 }
