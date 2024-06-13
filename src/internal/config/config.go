@@ -36,6 +36,7 @@ type Config struct {
 var Cfg = Config{}
 
 func Init() {
+	initLogger()
 	initConfig()
 	initDB()
 }
@@ -62,6 +63,8 @@ func initConfig() {
 This function will initial the SLOGGER
 */
 func initLogger() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 
 }
 
