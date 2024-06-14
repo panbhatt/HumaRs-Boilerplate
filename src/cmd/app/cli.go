@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
+	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/humacli"
@@ -26,7 +29,9 @@ func main() {
 	cli := humacli.New(func(hooks humacli.Hooks, options *CliOptions) {
 		fmt.Printf("CLI was started with the following options Debug=%v Host=%v Port=%v\n", options.Debug, options.Host, options.Port)
 
+		var server *http.Server
 		hooks.OnStart(func() {
+
 			config.Init()
 
 			// Similarly we need to update every single CONFIG as ENV Variable takes precendence over it.
@@ -35,12 +40,26 @@ func main() {
 			}
 
 			apiConfig := huma.DefaultConfig(config.Cfg.API_NAME, config.Cfg.API_VERSION)
-			api := routers.InitRouter(apiConfig)
+			_, server = routers.InitRouter(apiConfig)
 
-			slog.Info(api.OpenAPI().OpenAPI)
+			server.ListenAndServe()
+
+		})
+
+		hooks.OnStop(func() {
+			slog.Warn(("Server is shutting down in 2 seconds"))
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			server.Shutdown(ctx)
+
 		})
 
 	})
+
+	// This is to set the Root
+	rootCli := cli.Root()
+	rootCli.Use = "blokexplorer"
+	rootCli.Version = config.Cfg.API_VERSION
 
 	cli.Run()
 }
