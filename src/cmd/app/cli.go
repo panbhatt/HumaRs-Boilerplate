@@ -2,9 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"log/slog"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/humacli"
+
+	"github.com/panbhatt/HumaRs-Boilerplate/src/internal/config"
+	"github.com/panbhatt/HumaRs-Boilerplate/src/internal/config/routers"
 )
 
 /*
@@ -20,8 +24,22 @@ type CliOptions struct {
 func main() {
 
 	cli := humacli.New(func(hooks humacli.Hooks, options *CliOptions) {
-		fmt.Printf("CLI was started with the following options Debug=%v Host=%v Port=%v", options.Debug, options.Host, options.Port)
-		os.Exit(1)
+		fmt.Printf("CLI was started with the following options Debug=%v Host=%v Port=%v\n", options.Debug, options.Host, options.Port)
+
+		hooks.OnStart(func() {
+			config.Init()
+
+			// Similarly we need to update every single CONFIG as ENV Variable takes precendence over it.
+			if options.Port != "" {
+				config.Cfg.API_PORT = options.Port
+			}
+
+			apiConfig := huma.DefaultConfig(config.Cfg.API_NAME, config.Cfg.API_VERSION)
+			api := routers.InitRouter(apiConfig)
+
+			slog.Info(api.OpenAPI().OpenAPI)
+		})
+
 	})
 
 	cli.Run()
