@@ -40,7 +40,7 @@ func main() {
 			}
 
 			apiConfig := huma.DefaultConfig(config.Cfg.API_NAME, config.Cfg.API_VERSION)
-			_, server = routers.InitRouter(apiConfig)
+			_, server = routers.InitRouterAndStartServer(apiConfig)
 
 			server.ListenAndServe()
 

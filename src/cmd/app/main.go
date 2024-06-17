@@ -20,7 +20,13 @@ func main() {
 
 	config.Init()
 	apiConfig := huma.DefaultConfig(config.Cfg.API_NAME, config.Cfg.API_VERSION)
-	_, server := routers.InitRouter(apiConfig)
+	_, server := routers.InitRouterAndStartServer(apiConfig)
+
+	handleGracefulShutdown(server)
+
+}
+
+func handleGracefulShutdown(server *http.Server) {
 
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
@@ -31,19 +37,16 @@ func main() {
 	}()
 
 	<-done
+
 	slog.Warn("Shutting Down the Server Now ... ")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
 		slog.Error("Error while shutting down the server. Inititating Force Shutdown.. ")
 	} else {
-		slog.Error("Server Exiting...")
+		slog.Error("Server Exiting ...")
 	}
-
-}
-
-func handleGracefulShutdown(server *http.Server) {
-
-	//done := make(chan os.Signal)
 
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/panbhatt/HumaRs-Boilerplate/src/internal/handlers"
 )
 
-func InitRouter(humaApiConfig huma.Config) (humaApi huma.API, server *http.Server) {
+func InitRouterAndStartServer(humaApiConfig huma.Config) (humaApi huma.API, server *http.Server) {
 
 	switch config.Cfg.ROUTER {
 	case "chi":
