@@ -14,7 +14,6 @@ import (
 
 	"github.com/panbhatt/HumaRs-Boilerplate/src/internal/config"
 	"github.com/panbhatt/HumaRs-Boilerplate/src/internal/config/routers"
-	mdls "github.com/panbhatt/HumaRs-Boilerplate/src/internal/models/db"
 )
 
 func main() {
@@ -23,7 +22,6 @@ func main() {
 	apiConfig := huma.DefaultConfig(config.Cfg.API_NAME, config.Cfg.API_VERSION)
 	_, server := routers.InitRouterAndStartServer(apiConfig)
 
-	checkDatabaseConnectivity()
 	handleGracefulShutdown(server)
 
 }
@@ -51,19 +49,4 @@ func handleGracefulShutdown(server *http.Server) {
 		slog.Error("Server Exiting ...")
 	}
 
-}
-
-/*
-*
-This function will check the database connectivity by fetching first block on the Blocks Table
-*/
-func checkDatabaseConnectivity() {
-	var db = config.Cfg.DB
-	var blk mdls.Block
-	db.Where("number = 0").First(&blk) // THis will search the block by Block Number.
-	if blk.Hash != "" {
-		slog.Info("First Block in Chain -> ", "Block = ", blk)
-	} else {
-		slog.Info("Unable to find the first block in the chain.")
-	}
 }

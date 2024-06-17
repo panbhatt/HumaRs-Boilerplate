@@ -43,6 +43,7 @@ func main() {
 			_, server = routers.InitRouterAndStartServer(apiConfig)
 
 			server.ListenAndServe()
+			config.CheckDatabaseConnectivity()
 
 		})
 

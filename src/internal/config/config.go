@@ -12,6 +12,8 @@ import (
 	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	mdls "github.com/panbhatt/HumaRs-Boilerplate/src/internal/models/db"
 )
 
 /**
@@ -39,6 +41,7 @@ func Init() {
 	initLogger()
 	initConfig()
 	initDB()
+	CheckDatabaseConnectivity()
 }
 
 func initConfig() {
@@ -92,4 +95,20 @@ func initDB() {
 
 	slog.Info("Database has been successfully connected ", "URL", dsn)
 
+}
+
+/*
+*
+This function will check the database connectivity by fetching first block on the Blocks Table
+*/
+func CheckDatabaseConnectivity() {
+
+	var db = Cfg.DB
+	var blk mdls.Block
+	db.Where("number = 0").First(&blk) // THis will search the block by Block Number.
+	if blk.Hash != "" {
+		slog.Info("First Block in Chain -> ", "Block = ", blk)
+	} else {
+		slog.Info("Unable to find the first block in the chain.")
+	}
 }
